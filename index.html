@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>外資八月更新版</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0d0f14;
+    color: #e0e0e0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    padding: 16px;
+  }
+  .header {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+  }
+  .title { font-size: 20px; font-weight: 700; color: #74c0fc; }
+  .subtitle { font-size: 12px; color: #666; margin-top: 4px; }
+  .update-time { font-size: 11px; color: #555; margin-top: 8px; }
+  .no-data { color: #666; text-align: center; padding: 40px; }
+
+  /* 說明區 */
+  .legend {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 14px; margin-bottom: 20px;
+  }
+  .legend-title { font-size: 12px; font-weight: 700; color: #74c0fc; margin-bottom: 10px; }
+  .legend-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 6px; }
+  .legend-item { font-size: 11px; color: #888; display: flex; gap: 6px; align-items: flex-start; }
+  .ldot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .ldot-blue   { background: #74c0fc; }
+  .ldot-green  { background: #69db7c; }
+  .ldot-yellow { background: #ffd43b; }
+  .ldot-pink   { background: #f06595; }
+
+  /* 區塊標題 */
+  .section-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px; margin-top: 20px;
+  }
+  .section-header:first-of-type { margin-top: 0; }
+  .section-label {
+    font-size: 13px; font-weight: 700;
+    padding: 4px 12px; border-radius: 20px;
+  }
+  .label-full {
+    background: rgba(105,219,124,0.15); color: #69db7c;
+    border: 1px solid rgba(105,219,124,0.3);
+  }
+  .label-partial {
+    background: rgba(255,212,59,0.15); color: #ffd43b;
+    border: 1px solid rgba(255,212,59,0.3);
+  }
+  .section-count { font-size: 12px; color: #555; }
+
+  /* 卡片 */
+  .card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 16px; margin-bottom: 12px;
+  }
+  .card-full    { border-left: 3px solid rgba(105,219,124,0.6); }
+  .card-partial { border-left: 3px solid rgba(255,212,59,0.4); }
+
+  .card-header {
+    display: flex; justify-content: space-between;
+    align-items: flex-start; margin-bottom: 12px;
+  }
+  .stock-name { font-size: 16px; font-weight: 700; color: #fff; }
+  .stock-code { font-size: 12px; color: #888; margin-top: 2px; }
+
+  /* 主導外資標籤 */
+  .lead-broker {
+    background: rgba(116,192,252,0.12);
+    border: 1px solid rgba(116,192,252,0.25);
+    border-radius: 8px; padding: 8px 12px;
+    margin-bottom: 12px;
+  }
+  .lead-broker-title { font-size: 10px; color: #555; margin-bottom: 4px; }
+  .lead-broker-name  { font-size: 13px; font-weight: 700; color: #74c0fc; }
+  .lead-broker-meta  { font-size: 11px; color: #888; margin-top: 2px; }
+  .other-brokers     { font-size: 11px; color: #666; margin-top: 6px; }
+
+  /* 指標格 */
+  .metrics {
+    display: grid; grid-template-columns: repeat(3,1fr);
+    gap: 8px; margin-bottom: 12px;
+  }
+  .metric {
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px; padding: 8px; text-align: center;
+  }
+  .metric-label { font-size: 10px; color: #666; margin-bottom: 4px; }
+  .metric-value { font-size: 13px; font-weight: 700; }
+  .positive { color: #69db7c; }
+  .negative { color: #ff6b6b; }
+  .neutral  { color: #e0e0e0; }
+  .warning  { color: #ffd43b; }
+  .blue     { color: #74c0fc; }
+
+  /* Checklist */
+  .checklist-section { margin-bottom: 10px; }
+  .checklist-title { font-size: 10px; color: #555; margin-bottom: 6px; letter-spacing: 1px; }
+  .checklist { display: flex; flex-wrap: wrap; gap: 6px; }
+  .check-item {
+    font-size: 11px; padding: 3px 8px;
+    border-radius: 6px; background: rgba(255,255,255,0.05);
+  }
+  .check-pass { color: #69db7c; }
+  .check-fail { color: #ff6b6b; }
+
+  /* 成本狀態 */
+  .cost-box {
+    display: flex; justify-content: space-between;
+    padding: 8px 12px; border-radius: 8px;
+    font-size: 12px; margin-bottom: 10px;
+  }
+  .cost-profit { background: rgba(105,219,124,0.08); border: 1px solid rgba(105,219,124,0.2); }
+  .cost-loss   { background: rgba(255,100,100,0.08); border: 1px solid rgba(255,100,100,0.2); }
+
+  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 10px 0; }
+
+  /* 每日明細 */
+  .broker-section { margin-top: 10px; }
+  .broker-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px; padding: 10px; margin-bottom: 8px;
+  }
+  .broker-header {
+    display: flex; justify-content: space-between;
+    margin-bottom: 6px; font-size: 12px;
+  }
+  .broker-name-lead  { color: #74c0fc; font-weight: 700; }
+  .broker-name-other { color: #aaa; font-weight: 600; }
+  .broker-meta { color: #666; font-size: 11px; }
+  table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  th {
+    color: #555; font-weight: 500; padding: 5px 6px;
+    text-align: right; border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  th:first-child { text-align: left; }
+  td { padding: 5px 6px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  td:first-child { text-align: left; color: #888; }
+
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .tag { font-size: 10px; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.05); color: #888; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="title">外資八月更新版</div>
+  <div class="subtitle">長線外資主導分析 · 量價配合 · 股價強度 · 持股比例方向</div>
+  <div class="update-time" id="update-time">載入中...</div>
+</div>
+
+<div class="legend">
+  <div class="legend-title">📋 硬條件 + 新增條件說明</div>
+  <div class="legend-grid">
+    <div class="legend-item"><div class="ldot ldot-blue"></div>長線外資（摩根/瑞士信貸/德意志）任一占量≥3%</div>
+    <div class="legend-item"><div class="ldot ldot-blue"></div>主導外資（買最多那家）連買≥2日</div>
+    <div class="legend-item"><div class="ldot ldot-green"></div>量價配合：主導外資買超日均量>20日均量1.2倍</div>
+    <div class="legend-item"><div class="ldot ldot-green"></div>股價強度：現價>主導外資5日加權均買成本</div>
+    <div class="legend-item"><div class="ldot ldot-yellow"></div>外資持股比例：最近兩筆資料上升</div>
+    <div class="legend-item"><div class="ldot ldot-pink"></div>全部通過=綠色｜部分通過=黃色</div>
+  </div>
+</div>
+
+<div id="content">
+  <div class="no-data">載入資料中...</div>
+</div>
+
+<script>
+fetch('data.json?t=' + Date.now())
+  .then(r => r.json())
+  .then(data => {
+    document.getElementById('update-time').textContent = '更新時間：' + data.update_time;
+    const content = document.getElementById('content');
+    if (!data.stocks || data.stocks.length === 0) {
+      content.innerHTML = '<div class="no-data">今日無符合條件股票</div>';
+      return;
+    }
+
+    const full    = data.stocks.filter(s => s['通過等級'] === 'full');
+    const partial = data.stocks.filter(s => s['通過等級'] === 'partial');
+
+    const renderCards = (stocks, cardClass) => stocks.map(s => {
+      const costPct   = parseFloat(s['現價vs主導成本%']) || 0;
+      const costClass = costPct >= 0 ? 'cost-profit' : 'cost-loss';
+      const costText  = costPct >= 0
+        ? `主導外資獲利 +${costPct.toFixed(1)}%`
+        : `主導外資套牢 ${costPct.toFixed(1)}%`;
+
+      const dist5ma  = parseFloat(s['距5MA%'])  || 0;
+      const dist20ma = parseFloat(s['距月線%'])  || 0;
+      const dist60ma = parseFloat(s['距季線%'])  || 0;
+      const gain5d   = parseFloat(s['5日漲幅%']) || 0;
+
+      // 硬條件checklist
+      const hardChecks = [
+        ['占量≥3%',  s['占量≥3%']],
+        ['連買≥2日', s['連買≥2日']],
+        ['外資預篩', s['外資預篩']],
+      ];
+
+      // 新增checklist
+      const newChecks = [
+        ['量價配合', s['量價配合']],
+        ['股價強度', s['股價強度']],
+        ['持股比例↑', s['持股比例↑']],
+      ];
+
+      // 原有checklist
+      const oldChecks = [
+        ['投信同向',    s['投信同向']],
+        ['投信連買≥3日', s['投信連買≥3日']],
+        ['股價>5MA',   s['股價>5MA']],
+        ['止跌訊號',    s['止跌訊號']],
+      ];
+
+      const renderChecks = checks => checks.map(([label, val]) =>
+        `<span class="check-item ${val==='✅'?'check-pass':'check-fail'}">
+          ${val==='✅'?'✓':'✗'} ${label}</span>`
+      ).join('');
+
+      // 長線外資明細
+      const brokerHtml = (s.lt_daily || []).map((b, idx) => {
+        const isLead  = idx === 0;
+        const nameClass = isLead ? 'broker-name-lead' : 'broker-name-other';
+        const rows = (b['明細'] || []).map(d =>
+          `<tr>
+            <td>${d['日期']}</td>
+            <td style="color:${d['買超張']>0?'#69db7c':'#ff6b6b'}">${d['買超張']>0?'+':''}${d['買超張']}</td>
+            <td>${d['均買價']||'—'}</td>
+            <td>${d['均賣價']||'—'}</td>
+            <td>${d['還原收盤']||'—'}</td>
+          </tr>`
+        ).join('');
+        return `
+        <div class="broker-card">
+          <div class="broker-header">
+            <span class="${nameClass}">${isLead?'★ 主導：':'▶ 參與：'}${b['券商']}</span>
+            <span class="broker-meta">連買${b['連買日']}日 占量${b['占量%']}%</span>
+          </div>
+          <table>
+            <tr><th>日期</th><th>買超張</th><th>均買價</th><th>均賣價</th><th>還原收盤</th></tr>
+            ${rows}
+          </table>
+        </div>`;
+      }).join('');
+
+      return `
+      <div class="card ${cardClass}">
+        <div class="card-header">
+          <div>
+            <div class="stock-name">${s['名稱']}</div>
+            <div class="stock-code">${s['代碼']}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:12px;color:#555">新增 ${s['新增得分']}/3</div>
+            <div style="font-size:11px;color:#666;margin-top:2px">原有 ${s['原有得分']}/4</div>
+          </div>
+        </div>
+
+        <!-- 主導外資 -->
+        <div class="lead-broker">
+          <div class="lead-broker-title">★ 主導長線外資</div>
+          <div class="lead-broker-name">${s['主導外資']||'—'}</div>
+          <div class="lead-broker-meta">
+            連買${s['主導連買日']}日 ｜ 占量${s['主導占量%']}% ｜ 均成本${s['主導均成本']}
+          </div>
+          ${s['參與外資'] ? `<div class="other-brokers">參與：${s['參與外資']}</div>` : ''}
+        </div>
+
+        <!-- 指標格 -->
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-label">收盤價</div>
+            <div class="metric-value neutral">${s['收盤價']}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">5日漲幅</div>
+            <div class="metric-value ${gain5d>=0?'positive':'negative'}">
+              ${gain5d>=0?'+':''}${gain5d}%
+            </div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">外資10日淨買</div>
+            <div class="metric-value ${parseFloat(s['外資10日淨買'])>=0?'positive':'negative'}">
+              ${Math.round(s['外資10日淨買']||0)}張
+            </div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">距月線</div>
+            <div class="metric-value ${Math.abs(dist20ma)<10?'positive':'warning'}">
+              ${dist20ma>=0?'+':''}${dist20ma}%
+            </div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">距季線</div>
+            <div class="metric-value ${Math.abs(dist60ma)<15?'positive':'warning'}">
+              ${dist60ma>=0?'+':''}${dist60ma}%
+            </div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">投信連買</div>
+            <div class="metric-value ${parseInt(s['投信連買日'])>=3?'positive':'neutral'}">
+              ${s['投信連買日']}日
+            </div>
+          </div>
+        </div>
+
+        <!-- 成本狀態 -->
+        <div class="cost-box ${costClass}">
+          <span>主導均成本 ${s['主導均成本']}</span>
+          <span>${costText}</span>
+        </div>
+
+        <!-- Checklist -->
+        <div class="checklist-section">
+          <div class="checklist-title">硬條件</div>
+          <div class="checklist">${renderChecks(hardChecks)}</div>
+        </div>
+        <div class="checklist-section" style="margin-top:8px">
+          <div class="checklist-title">新增條件</div>
+          <div class="checklist">${renderChecks(newChecks)}</div>
+        </div>
+        <div class="checklist-section" style="margin-top:8px">
+          <div class="checklist-title">原有條件</div>
+          <div class="checklist">${renderChecks(oldChecks)}</div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- 長線外資明細 -->
+        <div class="broker-section">
+          ${brokerHtml || '<div style="color:#666;font-size:12px">無長線外資明細</div>'}
+        </div>
+
+        <div class="tag-row">
+          <span class="tag">外資5日 ${Math.round(s['外資5日淨買']||0)}張</span>
+          <span class="tag">持股比例 ${s['持股比例方向']||'—'}</span>
+          <span class="tag">量比 ${s['量價比']||'—'}</span>
+          <span class="tag">投信10日占比 ${s['投信10日占比%']}%</span>
+        </div>
+      </div>`;
+    }).join('');
+
+    content.innerHTML = `
+      <div class="section-header">
+        <span class="section-label label-full">全部通過</span>
+        <span class="section-count">${full.length} 檔</span>
+      </div>
+      ${full.length > 0
+        ? renderCards(full, 'card-full')
+        : '<div class="no-data" style="padding:16px">今日無全部通過股票</div>'
+      }
+      <div class="section-header">
+        <span class="section-label label-partial">部分通過</span>
+        <span class="section-count">${partial.length} 檔</span>
+      </div>
+      ${partial.length > 0
+        ? renderCards(partial, 'card-partial')
+        : '<div class="no-data" style="padding:16px">今日無部分通過股票</div>'
+      }
+    `;
+  })
+  .catch(() => {
+    document.getElementById('update-time').textContent = '尚無資料';
+    document.getElementById('content').innerHTML =
+      '<div class="no-data">尚未有今日資料，請稍後再試</div>';
+  });
+</script>
+</body>
+</html>
